@@ -34,15 +34,15 @@ public class ProductService {
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAllPaged(Long categoryId, String name, Pageable pageable) {
 		List<Category>  categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId));
-		Page<Product> list = repository.find(categories, name, pageable);
+		Page<Product> page = repository.find(categories, name, pageable);
 
 		/*
 		 * Esse bloco foi feito em apenas uma linha utilizando o map. List<ProductDTO>
 		 * listDto = new ArrayList<>(); for (Product x : list) { listDto.add(new
 		 * ProductDTO(x)); }
 		 */
-
-		return list.map(x -> new ProductDTO(x));
+		repository.findProductsWithCategories(page.getContent());
+		return page.map(x -> new ProductDTO(x, x.getCategories()));
 	}
 
 	@Transactional(readOnly = true)
